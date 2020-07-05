@@ -1,0 +1,21 @@
+version: '3'
+services:
+  packet-capture-engine:
+    container_name: pcap-engine
+    image: pacp-engine:latest
+    build:
+      context: ./src
+  packet-src:
+    container_name: packet-src
+    image: packet-src
+    build:
+      context: ./packet-src
+    links:
+      - packet-capture-engine
+  packet-dst:
+    container_name: pkt-dst
+    image: pkt-dst
+    build:
+      context: ./pkt-dst
+    links:
+      - packet-capture-engine

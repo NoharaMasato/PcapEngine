@@ -11,13 +11,14 @@
 #include <netinet/tcp.h>
 
 using namespace std;
+char* device;
 
 class Packet{
 public:
   // packet general
   int pkt_len;
   const u_char* data_buffer;
-  int ip_header_start,tcp_header_start;
+  int eth_header_start,ip_header_start,tcp_header_start;
 
   // ip attr
   struct in_addr srcip,dstip;
@@ -26,15 +27,16 @@ public:
   // tcp attr
   unsigned short srcport,dstport;
   
-  Packet(const u_char* packet,int len){
+  Packet(const u_char* packet,int len,int ip_hdr_start){
     struct ip *ip_header;
     struct tcphdr *tcp_header;
     struct udphdr *udp_header;
      
     data_buffer = packet;
     pkt_len = len;
-    ip_header_start = 4;
-    tcp_header_start = 24;
+
+    ip_header_start = ip_hdr_start;
+    tcp_header_start = ip_header_start + 20;
 
     // parse ip header
     ip_header = (struct ip *)(packet + ip_header_start);
@@ -72,12 +74,24 @@ public:
   }
 };
 
+void print_row_data(const u_char* data_buffer, int pkt_len){
+  for(int i(0);i<pkt_len;){
+    printf("%02x ",(int)(data_buffer[i]));
+    i++;
+    if(i%16==0) cout << endl;
+    else if(i%8==0) cout << " ";
+  }
+  cout << "\n\n";
+}
 
 void my_callback(u_char *useless,const struct pcap_pkthdr* pkthdr,const u_char* packet){
   int ip_header_start = 4;
+  if(((string)(device)).substr(0,3) == "eth") ip_header_start += 10;
+  cout << (packet[ip_header_start]>>4) << endl;
   // print_packet(packet,pkthdr->len);
+  // print_row_data(packet,pkthdr->len);
   if((packet[ip_header_start]>>4) == 4){
-    Packet pkt(packet,pkthdr->len);
+    Packet pkt(packet,pkthdr->len,ip_header_start);
     pkt.print_packet();
   }else{
     cout << "not ip v4 packet" << endl;
@@ -85,12 +99,33 @@ void my_callback(u_char *useless,const struct pcap_pkthdr* pkthdr,const u_char* 
 }
 
 int main(int argc,char *argv[]){
-  char* device = argv[1];
+  cout << "[pcap engine start]" << endl;
 
   char errbuf[PCAP_ERRBUF_SIZE];
   pcap_t *pcap_handle;
-  //struct pcap_pkthdr header;
   const u_char *packet;
+  if(argc == 2){
+    device = argv[1];
+  }else{
+    pcap_if_t *interfaces,*temp;
+    if(pcap_findalldevs(&interfaces,errbuf)==-1){
+      printf("\nerror in pcap findall devs");
+      return -1;   
+    }
+    for(temp=interfaces;temp;temp=temp->next){
+      cout << temp->name << endl;
+      if(((string)(temp->name)).substr(0,3) == "eth"){
+        device = temp->name;
+      }
+    }
+    if(device == NULL){
+      cout << "no ethernet network interface\n";
+      return 1;
+    }
+    //return 0;
+    // device = pcap_lookupdev(errbuf);
+  }
+  cout << "device:" << device << endl;
 
   pcap_handle = pcap_open_live(device, 4096, 1, 10, errbuf); // device, snapshot length, promiscas or not, errbuf
 

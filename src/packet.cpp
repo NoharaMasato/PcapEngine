@@ -8,52 +8,51 @@
 #include <iostream>
 
 Packet::Packet(const u_char *packet, int len, int ip_hdr_start) {
-  struct ip *ip_header;
-  struct tcphdr *tcp_header;
-  struct udphdr *udp_header;
-
   data_buffer = packet;
   pkt_len = len;
 
-  ip_header_start = ip_hdr_start;
-  tcp_header_start = ip_header_start + 20;
+  int tcp_header_start = ip_hdr_start + 20;
 
   // parse ip header
-  ip_header = (struct ip *)(packet + ip_header_start);
-  srcip = ip_header->ip_src;
-  dstip = ip_header->ip_dst;
-  tcp_proto = ip_header->ip_p;
-  ip_version = ip_header->ip_v;
+  ip_header = (struct ip *)(packet + ip_hdr_start);
 
   // parse tcp header
-  if (tcp_proto == IPPROTO_TCP) {
+  if (ip_header->ip_p == IPPROTO_TCP) {
     tcp_header = (struct tcphdr *)(packet + tcp_header_start);
-    srcport = tcp_header->th_sport;
-    dstport = tcp_header->th_dport;
-  } else if (tcp_proto == IPPROTO_UDP) {
+  } else if (ip_header->ip_p == IPPROTO_UDP) {
     udp_header = (struct udphdr *)(packet + tcp_header_start);
-    srcport = udp_header->uh_sport;
-    dstport = udp_header->uh_dport;
   }
 }
 
+in_addr Packet::src_ip_addr() { return ip_header->ip_src; }
+
+in_addr Packet::dst_ip_addr() { return ip_header->ip_dst; }
+
+u_char Packet::ip_version() { return ip_header->ip_v; }
+
+unsigned short Packet::src_port() {
+  if (ip_header->ip_p == IPPROTO_TCP)
+    return tcp_header->th_sport;
+  else if (ip_header->ip_p == IPPROTO_UDP)
+    return udp_header->uh_sport;
+}
+
+unsigned short Packet::dst_port() {
+  if (ip_header->ip_p == IPPROTO_TCP)
+    return tcp_header->th_dport;
+  else if (ip_header->ip_p == IPPROTO_UDP)
+    return udp_header->uh_dport;
+}
+
 void Packet::print_packet() {
-  if (tcp_proto == IPPROTO_TCP) {
+  if (ip_header->ip_p == IPPROTO_TCP) {
+    std::cout << "\n\n=====packet start=====";
     std::cout << "packet length:" << pkt_len << std::endl;
-    for (int i(0); i < pkt_len;) {
-      printf("%02x ", (int)(data_buffer[i]));
-      i++;
-      if (i % 16 == 0)
-        std::cout << std::endl;
-      else if (i % 8 == 0)
-        std::cout << " ";
-    }
-    std::cout << "\n";
-    std::cout << "src ip:" << inet_ntoa(srcip) << ","
-              << "dst ip:" << inet_ntoa(dstip) << std::endl;
-    std::cout << "src port:" << ntohs(srcport) << ","
-              << "dst port:" << ntohs(dstport) << std::endl;
-    std::cout << std::endl;
+    std::cout << "src ip:" << inet_ntoa(src_ip_addr()) << ","
+              << "dst ip:" << inet_ntoa(dst_ip_addr()) << std::endl;
+    std::cout << "src port:" << ntohs(src_port()) << ","
+              << "dst port:" << ntohs(dst_port()) << std::endl;
+    std::cout << "====packet end====";
   }
 }
 

@@ -3,24 +3,27 @@
 
 #include <netinet/in.h>
 
-class Packet{
-public:
-  // packet general
+class Packet {
   int pkt_len;
-  const u_char* data_buffer;
-  int eth_header_start,ip_header_start,tcp_header_start;
+  const u_char *data_buffer;
 
-  // ip attr
-  struct in_addr srcip,dstip;
-  u_char tcp_proto, ip_version;
+  struct ip *ip_header;
+  struct tcphdr *tcp_header;
+  struct udphdr *udp_header;
 
-  // tcp attr
-  unsigned short srcport,dstport;
-  
-  Packet(const u_char* packet,int len,int ip_hdr_start);
+ public:
+
+  Packet(const u_char *packet, int len, int ip_hdr_start);
+
+  u_char ip_version();
+
   void print_packet();
-
   void print_row_data();
+
+  in_addr src_ip_addr();
+  in_addr dst_ip_addr();
+
+  unsigned short src_port(), dst_port();
 };
 
-#endif 
+#endif

@@ -3,14 +3,15 @@
 #include <iostream>
 #include <string>
 
+#include "eth_device.hpp"
 #include "packet.hpp"
 
-char *device;
+eth_device* DEVICE;
 
 void my_callback(u_char *useless, const struct pcap_pkthdr *pkthdr,
                  const u_char *packet) {
   int ip_header_start = 4;
-  if (((std::string)(device)).substr(0, 3) == "eth") ip_header_start += 10;
+  if (DEVICE->is_ethernet_device()) ip_header_start += 10;
   std::cout << (packet[ip_header_start] >> 4) << std::endl;
 
   if ((packet[ip_header_start] >> 4) == 4) {
@@ -28,7 +29,8 @@ int main(int argc, char *argv[]) {
   pcap_t *pcap_handle;
 
   if (argc == 2) {
-    device = argv[1];
+    eth_device dev = (std::string)argv[1];
+    DEVICE = &dev;
   } else {
     pcap_if_t *interfaces, *temp;
     if (pcap_findalldevs(&interfaces, errbuf) == -1) {
@@ -36,20 +38,20 @@ int main(int argc, char *argv[]) {
       return -1;
     }
     for (temp = interfaces; temp; temp = temp->next) {
-      std::cout << temp->name << std::endl;
-      if (((std::string)(temp->name)).substr(0, 3) == "eth") {
-        device = temp->name;
+      eth_device dev = (std::string)(temp->name);
+      if (dev.is_ethernet_device()){
+        DEVICE = &dev;
       }
     }
-    if (device == NULL) {
+    if (DEVICE == NULL) {
       std::cout << "no ethernet network interface\n";
       return 1;
     }
   }
-  std::cout << "device:" << device << std::endl;
+  std::cout << "device:" << *DEVICE << std::endl;
 
   pcap_handle = pcap_open_live(
-      device, 4096, 1, 10,
+      (DEVICE->get_device_name()).c_str(), 4096, 1, 10,
       errbuf);  // device, snapshot length, promiscas or not, errbuf
 
   if (pcap_handle == NULL) {

@@ -1,5 +1,5 @@
 CC=/usr/bin/g++
-SRCS=main.cpp packet.cpp ipv4.cpp
+SRCS=main.cpp packet.cpp ipv4.cpp eth_device.cpp
 OBJS=$(SRCS:.cpp=.o)
 CPPFLAGS=-c -std=c++17
 

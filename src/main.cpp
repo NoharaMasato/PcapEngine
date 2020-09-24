@@ -6,13 +6,13 @@
 #include "eth_device.hpp"
 #include "packet.hpp"
 
-eth_device* DEVICE;
+eth_device *DEVICE;
 
 void my_callback(u_char *useless, const struct pcap_pkthdr *pkthdr,
                  const u_char *packet) {
   int ip_header_start = 4;
   if (DEVICE->is_ethernet_device()) ip_header_start += 10;
-  std::cout << (packet[ip_header_start] >> 4) << std::endl;
+  // std::cout << (packet[ip_header_start] >> 4) << std::endl;
 
   if ((packet[ip_header_start] >> 4) == 4) {
     Packet pkt(packet, pkthdr->len, ip_header_start);
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
     }
     for (temp = interfaces; temp; temp = temp->next) {
       eth_device dev = (std::string)(temp->name);
-      if (dev.is_ethernet_device()){
+      if (dev.is_ethernet_device()) {
         DEVICE = &dev;
       }
     }

@@ -12,7 +12,6 @@ class Packet {
   struct udphdr *udp_header;
 
  public:
-
   Packet(const u_char *packet, int len, int ip_hdr_start);
 
   u_char ip_version();

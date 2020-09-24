@@ -35,6 +35,8 @@ unsigned short Packet::src_port() {
     return tcp_header->th_sport;
   else if (ip_header->ip_p == IPPROTO_UDP)
     return udp_header->uh_sport;
+  else
+    return 0;
 }
 
 unsigned short Packet::dst_port() {
@@ -42,17 +44,19 @@ unsigned short Packet::dst_port() {
     return tcp_header->th_dport;
   else if (ip_header->ip_p == IPPROTO_UDP)
     return udp_header->uh_dport;
+  else
+    return 0;
 }
 
 void Packet::print_packet() {
   if (ip_header->ip_p == IPPROTO_TCP) {
-    std::cout << "\n\n=====packet start=====";
-    std::cout << "packet length:" << pkt_len << std::endl;
-    std::cout << "src ip:" << inet_ntoa(src_ip_addr()) << ","
-              << "dst ip:" << inet_ntoa(dst_ip_addr()) << std::endl;
-    std::cout << "src port:" << ntohs(src_port()) << ","
-              << "dst port:" << ntohs(dst_port()) << std::endl;
-    std::cout << "====packet end====";
+    std::cout << "\n\n=====packet start=====\n";
+    std::cout << "packet length " << pkt_len << "\n"
+              << "src ip        " << inet_ntoa(src_ip_addr()) << "\n"
+              << "dst ip        " << inet_ntoa(dst_ip_addr()) << "\n"
+              << "src port      " << ntohs(src_port()) << "\n"
+              << "dst port      " << ntohs(dst_port()) << "\n"
+              << "=====packet end=======\n";
   }
 }
 

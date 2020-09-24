@@ -1,9 +1,9 @@
-#include "packet.hpp"
-
 #include <pcap.h>
 
 #include <iostream>
 #include <string>
+
+#include "packet.hpp"
 
 char *device;
 

@@ -1,11 +1,26 @@
-main: packet.o main.o
-	g++ -Wall main.o packet.o -lpcap -o pcap
+CC=/usr/bin/g++
+SRCS=main.cpp packet.cpp ipv4.cpp
+OBJS=$(SRCS:.cpp=.o)
+CPPFLAGS=-c -std=c++17
 
-main.o:
-	g++ -Wall main.cpp -c
+.PHONY: release
+release: CPPFLAGS+=-O0 -DNDEBUG
+release: build
 
-packet.o: 
-	g++ -Wall packet.cpp -c
+.PHONY: dev
+dev: CPPFLAGS+=-g -O3 -Wall -W
+dev: build
 
+# オブジェクトファイルをリンクする
+.PHONY: build
+build: $(OBJS)
+	$(CC) $(OBJS) -lpcap -o pcap
+
+# .cppから.oに変換する際のルールを指定(コンパイル)
+.cpp.o:
+	$(CC) $(CPPFLAGS) $<
+
+
+.PHONY: clean
 clean:
 	rm *.o && rm pcap

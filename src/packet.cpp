@@ -1,6 +1,8 @@
 #include "packet.hpp"
 
 #include <arpa/inet.h>
+#include <net/ethernet.h>
+#include <netinet/ether.h>
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
 #include <netinet/udp.h>
@@ -11,21 +13,32 @@ Packet::Packet(const u_char *packet, int len, int ip_hdr_start) {
   data_buffer = packet;
   pkt_len = len;
 
-  int tcp_header_start = ip_hdr_start + 20;
+  // parse ethernet header
+  ethernet_header = (struct ether_header *)packet;
 
   // parse ip header
   ip_header = (struct ip *)(packet + ip_hdr_start);
 
   // parse tcp header
+  int tcp_header_start = ip_hdr_start + IP_HEADER_SIZE;
   if (ip_header->ip_p == IPPROTO_TCP) {
     tcp_header = (struct tcphdr *)(packet + tcp_header_start);
+    payload =
+        (const u_char *)((unsigned char *)tcp_header + (tcp_header->doff * 4));
   } else if (ip_header->ip_p == IPPROTO_UDP) {
     udp_header = (struct udphdr *)(packet + tcp_header_start);
+    payload = (const u_char *)((unsigned char *)udp_header + UDP_HEADER_SIZE);
   }
 }
 
-in_addr Packet::src_ip_addr() { return ip_header->ip_src; }
+const struct ether_addr *Packet::src_ether_addr() {
+  return (const struct ether_addr *)&(ethernet_header->ether_shost);
+}
+const struct ether_addr *Packet::dst_ether_addr() {
+  return (const struct ether_addr *)&(ethernet_header->ether_dhost);
+}
 
+in_addr Packet::src_ip_addr() { return ip_header->ip_src; }
 in_addr Packet::dst_ip_addr() { return ip_header->ip_dst; }
 
 u_char Packet::ip_version() { return ip_header->ip_v; }
@@ -52,10 +65,13 @@ void Packet::print_packet() {
   if (ip_header->ip_p == IPPROTO_TCP) {
     std::cout << "\n\n=====packet start=====\n";
     std::cout << "packet length " << pkt_len << "\n"
+              << "src mac       " << ether_ntoa(src_ether_addr()) << "\n"
+              << "dst mac       " << ether_ntoa(dst_ether_addr()) << "\n"
               << "src ip        " << inet_ntoa(src_ip_addr()) << "\n"
               << "dst ip        " << inet_ntoa(dst_ip_addr()) << "\n"
               << "src port      " << ntohs(src_port()) << "\n"
               << "dst port      " << ntohs(dst_port()) << "\n"
+              << "content       " << payload << "\n"
               << "=====packet end=======\n";
   }
 }

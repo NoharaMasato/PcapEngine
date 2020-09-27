@@ -20,8 +20,7 @@ class Packet {
   Packet(const u_char *packet, int len, int ip_hdr_start);
 
   // data link layer
-  const struct ether_addr *src_ether_addr();
-  const struct ether_addr *dst_ether_addr();
+  struct ether_addr *src_ether_addr(), *dst_ether_addr();
 
   // ip layer
   u_char ip_version();
@@ -31,7 +30,7 @@ class Packet {
   unsigned short src_port(), dst_port();
 
   // print packet
-  void print_packet();
+  void print_meta_data();
   void print_row_data();
 };
 

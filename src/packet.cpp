@@ -31,11 +31,11 @@ Packet::Packet(const u_char *packet, int len, int ip_hdr_start) {
   }
 }
 
-const struct ether_addr *Packet::src_ether_addr() {
-  return (const struct ether_addr *)&(ethernet_header->ether_shost);
+struct ether_addr *Packet::src_ether_addr() {
+  return (struct ether_addr *)&(ethernet_header->ether_shost);
 }
-const struct ether_addr *Packet::dst_ether_addr() {
-  return (const struct ether_addr *)&(ethernet_header->ether_dhost);
+struct ether_addr *Packet::dst_ether_addr() {
+  return (struct ether_addr *)&(ethernet_header->ether_dhost);
 }
 
 in_addr Packet::src_ip_addr() { return ip_header->ip_src; }
@@ -61,7 +61,7 @@ unsigned short Packet::dst_port() {
     return 0;
 }
 
-void Packet::print_packet() {
+void Packet::print_meta_data() {
   if (ip_header->ip_p == IPPROTO_TCP) {
     std::cout << "\n\n=====packet start=====\n";
     std::cout << "packet length " << pkt_len << "\n"

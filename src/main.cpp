@@ -2,20 +2,25 @@
 
 #include <iostream>
 #include <string>
+#include <unordered_map>
 
 #include "eth_device.hpp"
 #include "packet.hpp"
+#include "tcp_stream.hpp"
 
 eth_device *DEVICE;
+std::unordered_map<five_tuple, tcp_stream> tcp_streams;  // hash table
 
 void my_callback(u_char *useless, const struct pcap_pkthdr *pkthdr,
                  const u_char *packet) {
   int ip_header_start = 4;
-  if (DEVICE->is_ethernet_device()) ip_header_start += 10;
+  if (DEVICE->is_ethernet_device()) ip_header_start += ETHERNET_HEADER_SIZE;
 
   if ((packet[ip_header_start] >> 4) == 4) {
     Packet pkt(packet, pkthdr->len, ip_header_start);
     pkt.print_meta_data();
+    tcp_streams[pkt.to_five_tuple()].add_packet_to_stream(&pkt);
+    tcp_streams[pkt.to_five_tuple()].print_stream();
   } else {
     std::cout << "not ip v4 packet" << std::endl;
   }

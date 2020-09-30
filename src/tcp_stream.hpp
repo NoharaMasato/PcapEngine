@@ -5,18 +5,13 @@
 
 #include <vector>
 
-struct five_tuple {
-  in_addr src_ip, dst_ip;
-  u_char ip_version;
-  unsigned short src_port, dst_port;
-};
+#include "packet.hpp"
 
 class tcp_stream {
-  five_tuple key;
-  std::vector<u_char*> contents;
+  std::vector<const u_char *> contents;
 
  public:
-  void add_packet_to_stream();
+  void add_packet_to_stream(Packet *pkt);
   void print_stream();
 };
 

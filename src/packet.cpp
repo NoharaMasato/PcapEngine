@@ -61,6 +61,13 @@ unsigned short Packet::dst_port() {
     return 0;
 }
 
+const u_char *Packet::l7_content() { return payload; }
+
+five_tuple Packet::to_five_tuple() {
+  return five_tuple{src_ip_addr(), dst_ip_addr(), ip_version(), src_port(),
+                    dst_port()};
+}
+
 void Packet::print_meta_data() {
   if (ip_header->ip_p == IPPROTO_TCP) {
     std::cout << "\n\n=====packet start=====\n";

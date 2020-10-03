@@ -4,18 +4,35 @@ services:
     container_name: pcap-engine
     image: pacp-engine:latest
     build:
-      context: ./src
-  packet-src:
-    container_name: pkt-src
-    image: pkt-src
-    build:
-      context: ./pkt-src
-    links:
-      - packet-capture-engine
+      context: ./
+      dockerfile: ./docker/Dockerfile
+    networks:
+      - app_net
   packet-dst:
     container_name: pkt-dst
     image: pkt-dst
     build:
-      context: ./pkt-dst
+      context: ./
+      dockerfile: ./docker/dst-Dockerfile
     links:
       - packet-capture-engine
+    networks:
+      - app_net
+  packet-src:
+    container_name: pkt-src
+    image: pkt-src
+    build:
+      context: ./
+      dockerfile: ./docker/src-Dockerfile
+    links:
+      - packet-capture-engine
+    networks:
+      - app_net
+
+networks:
+  app_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.0.0/24

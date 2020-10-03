@@ -1,6 +1,11 @@
 CC=/usr/bin/g++
-SRCS=packet.cpp ipv4.cpp eth_device.cpp tcp_stream.cpp main.cpp
-OBJS=$(SRCS:.cpp=.o)
+
+SRC_DIR=src
+OBJ_DIR=obj
+
+SRCS=$(wildcard $(SRC_DIR)/*.cpp)
+OBJS := $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+
 CPPFLAGS=-c -std=c++17
 
 # デフォルトのターゲット指定
@@ -23,15 +28,15 @@ build: $(OBJS)
 
 # .cppから.oに変換する際のルールを指定(コンパイル)
 # $<は依存するファイルの最初のもの
-.cpp.o:
-	$(CC) $(CPPFLAGS) $<
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CC) $(CPPFLAGS) $< -o $@
 
 .PHONY: clean
 clean:
-	rm *.o && rm pcap
+	rm $(OBJ_DIR)/*.o && rm pcap
 
 # 依存関係(gcc -MM *.cppで出力)
-ipv4.o: ipv4.cpp ipv4.hpp
-main.o: main.cpp config.hpp eth_device.hpp packet.hpp tcp_stream.hpp
-packet.o: packet.cpp packet.hpp
-tcp_stream.o: tcp_stream.cpp tcp_stream.hpp packet.hpp
+obj/ipv4.o: src/ipv4.cpp src/ipv4.hpp
+obj/main.o: src/main.cpp src/config.hpp src/eth_device.hpp src/packet.hpp src/tcp_stream.hpp
+obj/packet.o: src/packet.cpp src/packet.hpp
+obj/tcp_stream.o: src/tcp_stream.cpp src/tcp_stream.hpp src/packet.hpp

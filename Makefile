@@ -12,6 +12,7 @@ CPPFLAGS=-c -std=c++17
 .DEFAULT_GOAL := dev
 
 .PHONY: release
+release: clean #はじめに全て消す
 release: CPPFLAGS+=-O0 -DNDEBUG
 release: EXE_FILE_NAME=release
 release: build

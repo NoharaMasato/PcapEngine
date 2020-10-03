@@ -15,8 +15,8 @@ eth_device *DEVICE;
 std::unordered_map<five_tuple, tcp_stream> tcp_streams;  // hash table
 long long int total_packet_size(0);
 
-void my_callback(u_char *useless, const struct pcap_pkthdr *pkthdr,
-                 const u_char *packet) {
+void my_callback(u_char *useless __attribute__((unused)),
+                 const struct pcap_pkthdr *pkthdr, const u_char *packet) {
 #ifdef PRINT_DEBUG
   int ip_header_start = 4;
   if (DEVICE->is_ethernet_device()) ip_header_start += ETHERNET_HEADER_SIZE;
@@ -25,7 +25,7 @@ void my_callback(u_char *useless, const struct pcap_pkthdr *pkthdr,
     Packet pkt(packet, pkthdr->len, ip_header_start);
     pkt.print_meta_data();
     tcp_streams[pkt.to_five_tuple()].add_packet_to_stream(&pkt);
-    tcp_streams[pkt.to_five_tuple()].print_stream();
+    // tcp_streams[pkt.to_five_tuple()].print_stream();
   } else {
     std::cout << "not ip v4 packet" << std::endl;
   }
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
   std::chrono::system_clock::time_point start, end;
   start = std::chrono::system_clock::now();
 
-  pcap_loop(pcap_handle, (int)1e7, my_callback, NULL);
+  pcap_loop(pcap_handle, PACKET_CNT, my_callback, NULL);
 
   //ここまでに受け取ったパケットの統計情報をstatに入れる
   pcap_stats(pcap_handle, &stat);
@@ -87,9 +87,10 @@ int main(int argc, char *argv[]) {
 
   std::cout << "=====report====="
             << "\n"
-            << "パケット処理量:" << total_packet_size / 1e9 << "[GB]\n"
+            << "パケット処理量:" << total_packet_size / 1e9 * 8 << "[Gb]\n"
             << "処理時間" << time << " [ms]\n"
-            << "スループット" << total_packet_size / time / 1e6 << " [Gbps]\n"
+            << "スループット" << total_packet_size / time / 1e6 * 8
+            << " [Gbps]\n"
             << "受け取ったパケット数" << stat.ps_recv << "\n"
             << "dropしたパケット数" << stat.ps_drop << "\n"
             << "ネットワークでdropしたパケット数" << stat.ps_ifdrop << "\n"

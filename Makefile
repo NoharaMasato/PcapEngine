@@ -31,6 +31,12 @@ dev: build
 build: $(OBJS)
 	$(CC) $(OBJS) -lpcap -o $(EXE_FILE_NAME)
 
+.PHONY: clean
+clean:
+	rm $(OBJ_DIR)/*.o $(DEP_DIR)/*.d pcap
+
+# これ以下は変換ルールの指定
+
 # .cppから.oに変換する際のルールを指定(コンパイル)
 # $<は依存するファイルの最初のもの
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
@@ -42,7 +48,3 @@ $(DEP_DIR)/%.d: $(SRC_DIR)/%.cpp $(HEADERS)
 
 # オブジェクトファイルの依存関係を上書きする
 -include $(DEP_DIR)/${DEPS}
-
-.PHONY: clean
-clean:
-	rm $(OBJ_DIR)/*.o $(DEP_DIR)/*.d pcap

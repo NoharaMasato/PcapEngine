@@ -1,12 +1,16 @@
-CC=/usr/bin/g++
+CC := /usr/bin/g++
 
-SRC_DIR=src
-OBJ_DIR=obj
+SRC_DIR := src
+OBJ_DIR := obj
+DEP_DIR := deps
 
-SRCS=$(wildcard $(SRC_DIR)/*.cpp)
+# :=は即時評価, =は遅延評価
+SRCS := $(wildcard $(SRC_DIR)/*.cpp)
+HEADERS := $(wildcard $(SRC_DIR)/*.h)
 OBJS := $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+DEPS := $(SRCS:$(SRC_DIR)/%.cpp=$(DEP_DIR)/%.d)
 
-CPPFLAGS=-c -std=c++17
+CPPFLAGS := -c -std=c++17
 
 # デフォルトのターゲット指定
 .DEFAULT_GOAL := dev
@@ -32,12 +36,13 @@ build: $(OBJS)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) $(CPPFLAGS) $< -o $@
 
+# 依存関係ファイルの作成(sedにより、一行目の先頭にobj/という文字を追加している)
+$(DEP_DIR)/%.d: $(SRC_DIR)/%.cpp $(HEADERS)
+	${CC} -MM $< | sed -e 's/^$*/$(OBJ_DIR)\/$*/g' > $(DEP_DIR)/$*.d
+
+# オブジェクトファイルの依存関係を上書きする
+-include $(DEP_DIR)/${DEPS}
+
 .PHONY: clean
 clean:
-	rm $(OBJ_DIR)/*.o && rm pcap
-
-# 依存関係(gcc -MM *.cppで出力)
-obj/ipv4.o: src/ipv4.cpp src/ipv4.hpp
-obj/main.o: src/main.cpp src/config.hpp src/eth_device.hpp src/packet.hpp src/tcp_stream.hpp
-obj/packet.o: src/packet.cpp src/packet.hpp
-obj/tcp_stream.o: src/tcp_stream.cpp src/tcp_stream.hpp src/packet.hpp
+	rm $(OBJ_DIR)/*.o $(DEP_DIR)/*.d pcap

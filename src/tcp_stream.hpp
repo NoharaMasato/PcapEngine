@@ -1,8 +1,9 @@
-#ifndef TCP_STREAM_H
-#define TCP_STREAM_H
+#ifndef TCP_STREAM_H_
+#define TCP_STREAM_H_
 
 #include <netinet/in.h>
 
+#include <iostream>
 #include <vector>
 
 #include "packet.hpp"

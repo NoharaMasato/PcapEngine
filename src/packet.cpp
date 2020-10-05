@@ -1,14 +1,5 @@
 #include "packet.hpp"
 
-#include <arpa/inet.h>
-#include <net/ethernet.h>
-#include <netinet/ether.h>
-#include <netinet/ip.h>
-#include <netinet/tcp.h>
-#include <netinet/udp.h>
-
-#include <iostream>
-
 Packet::Packet(const u_char *packet, int len, int ip_hdr_start) {
   data_buffer = packet;
   pkt_len = len;

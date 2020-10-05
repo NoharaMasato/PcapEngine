@@ -1,8 +1,15 @@
 #ifndef PACKET_H_
 #define PACKET_H_
 
+#include <arpa/inet.h>
+#include <net/ethernet.h>
+#include <netinet/ether.h>
 #include <netinet/in.h>
+#include <netinet/ip.h>
+#include <netinet/tcp.h>
+#include <netinet/udp.h>
 
+#include <iostream>
 #include <string>
 
 const int ETHERNET_HEADER_SIZE = 10, IP_HEADER_SIZE = 20, UDP_HEADER_SIZE = 8;

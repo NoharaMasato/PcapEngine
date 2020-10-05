@@ -2,3 +2,5 @@
 pcap
 release
 *.o
+*.d
+gmon.out

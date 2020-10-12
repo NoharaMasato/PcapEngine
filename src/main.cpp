@@ -25,9 +25,11 @@ void my_callback(u_char *useless __attribute__((unused)),
   if ((packet[ip_header_start] >> 4) == 4) {
     Packet pkt(packet, pkthdr->len, ip_header_start);
     pkt.print_meta_data();
-    insert_string(pkt.to_five_tuple().to_string(), "1");
-    // tcp_streams[pkt.to_five_tuple()].add_packet_to_stream(&pkt);
-    // tcp_streams[pkt.to_five_tuple()].print_stream();
+    insert_string(
+        pkt.to_five_tuple().to_string(),
+        std::string(reinterpret_cast<const char *>(pkt.l7_content())));
+    tcp_streams[pkt.to_five_tuple()].add_packet_to_stream(&pkt);
+    tcp_streams[pkt.to_five_tuple()].print_stream();
   } else {
     std::cout << "not ip v4 packet" << std::endl;
   }

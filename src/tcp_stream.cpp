@@ -1,9 +1,5 @@
 #include "tcp_stream.hpp"
 
-#include <iostream>
-
-#include "packet.hpp"
-
 void tcp_stream::add_packet_to_stream(Packet *pkt) {
   contents.push_back(pkt->l7_content());
 }

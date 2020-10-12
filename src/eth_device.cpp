@@ -1,7 +1,5 @@
 #include "eth_device.hpp"
 
-#include <iostream>
-
 eth_device::eth_device(std::string name) {
   device_name = name;
   if (name.substr(0, 3) == "eth" || name.substr(0, 3) == "enp") {

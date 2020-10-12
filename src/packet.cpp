@@ -1,13 +1,16 @@
 #include "packet.hpp"
 
-#include <arpa/inet.h>
-#include <net/ethernet.h>
-#include <netinet/ether.h>
-#include <netinet/ip.h>
-#include <netinet/tcp.h>
-#include <netinet/udp.h>
+bool five_tuple::operator==(const five_tuple &other) const {
+  return (src_ip.s_addr == other.src_ip.s_addr &&
+          dst_ip.s_addr == other.dst_ip.s_addr && src_port == other.src_port &&
+          dst_port == other.dst_port && ip_version == other.ip_version);
+}
 
-#include <iostream>
+std::string five_tuple::to_string() {
+  std::string ret_val;
+  return std::to_string(src_ip.s_addr) + std::to_string(dst_ip.s_addr) +
+         std::to_string(src_port) + std::to_string(dst_port) + std::to_string(ip_version);
+}
 
 Packet::Packet(const u_char *packet, int len, int ip_hdr_start) {
   data_buffer = packet;

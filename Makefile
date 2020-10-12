@@ -10,7 +10,13 @@ HEADERS := $(wildcard $(SRC_DIR)/*.h)
 OBJS := $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 DEPS := $(SRCS:$(SRC_DIR)/%.cpp=$(DEP_DIR)/%.d)
 
-CPPFLAGS := -c -std=c++17
+BASE_PATH := ~/lib/acl
+CPPFLAGS = -c -std=c++17 -I $(BASE_PATH)/lib_acl_cpp/include -DLINUX2
+LDFLAGS = -L $(BASE_PATH)/lib_acl_cpp/lib -l_acl_cpp \
+				-L $(BASE_PATH)/lib_protocol/lib -l_protocol \
+				-L $(BASE_PATH)/lib_acl/lib -l_acl \
+				-lpcap \
+				-lpthread
 
 # デフォルトのターゲット指定
 .DEFAULT_GOAL := dev
@@ -29,7 +35,7 @@ dev: build
 # オブジェクトファイルをリンクする
 .PHONY: build
 build: $(OBJS)
-	$(CC) $(OBJS) -lpcap -o $(EXE_FILE_NAME)
+	$(CC) $(OBJS) -o $(EXE_FILE_NAME) $(LDFLAGS)
 
 .PHONY: clean
 clean:

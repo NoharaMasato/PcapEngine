@@ -16,6 +16,10 @@ WORKDIR /usr/src/pcap_app
 
 RUN apt-get -y update && apt-get -y install libpcap-dev iproute2
 
+# packet転送, routingの設定
+RUN /sbin/route add -host 192.168.0.2 eth0
+RUN /sbin/route add -host 192.168.1.2 eth1
+
 COPY --from=build-stage /usr/src/pcap_app/pcap .
 
 CMD ["./pcap", "eth0"]

@@ -6,6 +6,8 @@ services:
     build:
       context: ./
       dockerfile: ./docker/Dockerfile
+    environment:
+      - REDIS_HOST=redis:6379
     networks:
       - packet-src-network
       - packet-dst-network
@@ -17,15 +19,13 @@ services:
       - "6379:6379"
     volumes:
       - "./data/redis:/data"
-      # - "./conf/:/etc/"
-    # command: redis-server /etc/redis.conf
     environment:
       - REDIS_URL=0.0.0.0
     networks:
       - packet-src-network
 
   packet-dst:
-    container_name: pkt-dst
+    container_name: pcap-dst
     image: pkt-dst
     build:
       context: ./
@@ -36,7 +36,7 @@ services:
       - packet-dst-network
 
   packet-src:
-    container_name: pkt-src
+    container_name: pcap-src
     image: pkt-src
     build:
       context: ./

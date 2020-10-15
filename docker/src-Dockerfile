@@ -1,5 +1,6 @@
-FROM alpine:latest
+FROM ubuntu:latest
 
 WORKDIR /
+RUN apt-get update -y && apt-get install -y netcat
 
 CMD ["nc","pkt-dst","8080"]

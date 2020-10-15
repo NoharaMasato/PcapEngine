@@ -4,3 +4,4 @@ release
 *.o
 *.d
 gmon.out
+data/

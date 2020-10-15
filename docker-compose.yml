@@ -7,7 +7,23 @@ services:
       context: ./
       dockerfile: ./docker/Dockerfile
     networks:
-      - app_net
+      - packet-src-network
+      - packet-dst-network
+
+  redis:
+    container_name: pcap-redis
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    volumes:
+      - "./data/redis:/data"
+      # - "./conf/:/etc/"
+    # command: redis-server /etc/redis.conf
+    environment:
+      - REDIS_URL=0.0.0.0
+    networks:
+      - packet-src-network
+
   packet-dst:
     container_name: pkt-dst
     image: pkt-dst
@@ -17,7 +33,8 @@ services:
     links:
       - packet-capture-engine
     networks:
-      - app_net
+      - packet-dst-network
+
   packet-src:
     container_name: pkt-src
     image: pkt-src
@@ -27,12 +44,18 @@ services:
     links:
       - packet-capture-engine
     networks:
-      - app_net
+      - packet-src-network
 
 networks:
-  app_net:
+  packet-src-network:
     driver: bridge
     ipam:
       driver: default
       config:
-        - subnet: 172.30.0.0/24
+        - subnet: 192.168.0.0/24
+  packet-dst-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.1.0/24

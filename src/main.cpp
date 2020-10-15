@@ -78,6 +78,7 @@ int main(int argc, char *argv[]) {
   std::chrono::system_clock::time_point start, end;
   start = std::chrono::system_clock::now();
 
+  redis_init();
   pcap_loop(pcap_handle, PACKET_CNT, my_callback, NULL);
 
   //ここまでに受け取ったパケットの統計情報をstatに入れる

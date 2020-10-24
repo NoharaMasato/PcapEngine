@@ -27,6 +27,8 @@ services:
   packet-dst:
     container_name: pcap-dst
     image: pkt-dst
+    cap_add:
+      - NET_ADMIN
     build:
       context: ./
       dockerfile: ./docker/dst-Dockerfile
@@ -36,6 +38,9 @@ services:
       - packet-dst-network
 
   packet-src:
+    privileged: true
+    cap_add:
+      - NET_ADMIN
     container_name: pcap-src
     image: pkt-src
     build:

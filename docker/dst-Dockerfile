@@ -1,6 +1,7 @@
 FROM ubuntu:latest
 
 WORKDIR /
-RUN apt-get update -y && apt-get install -y netcat
+RUN apt-get update -y && apt-get install -y netcat iproute2 iputils-ping tcpdump
+RUN ip route add 192.168.0.0/24 via 192.168.1.2
 
 CMD ["nc","-l","8080"]

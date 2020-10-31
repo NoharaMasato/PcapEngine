@@ -9,8 +9,10 @@ services:
     environment:
       - REDIS_HOST=redis:6379
     networks:
-      - packet-src-network
-      - packet-dst-network
+      packet-src-network:
+        ipv4_address: 192.168.10.3
+      packet-dst-network:
+        ipv4_address: 192.168.11.3
 
   redis:
     container_name: pcap-redis
@@ -22,12 +24,14 @@ services:
     environment:
       - REDIS_URL=0.0.0.0
     networks:
-      - packet-src-network
+      packet-src-network:
+        ipv4_address: 192.168.10.4
 
   packet-dst:
     container_name: pcap-dst
     image: pkt-dst
-    cap_add:
+    privileged: true
+    cap_drop:
       - NET_ADMIN
     build:
       context: ./
@@ -35,21 +39,23 @@ services:
     links:
       - packet-capture-engine
     networks:
-      - packet-dst-network
+      packet-dst-network:
+        ipv4_address: 192.168.11.2
 
   packet-src:
-    privileged: true
-    cap_add:
-      - NET_ADMIN
     container_name: pcap-src
     image: pkt-src
+    privileged: true
+    cap_drop:
+      - NET_ADMIN
     build:
       context: ./
       dockerfile: ./docker/src-Dockerfile
     links:
       - packet-capture-engine
     networks:
-      - packet-src-network
+      packet-src-network:
+        ipv4_address: 192.168.10.2
 
 networks:
   packet-src-network:
@@ -57,10 +63,11 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 192.168.0.0/24
+        - subnet: 192.168.10.0/24
   packet-dst-network:
     driver: bridge
     ipam:
       driver: default
       config:
-        - subnet: 192.168.1.0/24
+        - subnet: 192.168.11.0/24
+

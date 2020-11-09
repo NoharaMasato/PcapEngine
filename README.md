@@ -10,7 +10,7 @@ redis-client(https://github.com/acl-dev/acl/tree/master/lib_acl_cpp/samples/redi
 make
 ```
 
-## run with docker (WIP)
+## run with docker
 ```
-docker-compose up
+docker-compose up -d
 ```

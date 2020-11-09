@@ -22,5 +22,5 @@ RUN apt-get -y update && apt-get -y install libpcap-dev iproute2 iputils-ping ne
 
 COPY --from=build-stage /usr/src/pcap_app/pcap .
 
-# CMD ["./pcap", "eth0"]
-CMD ["nc","-l","8080"]
+CMD ["./pcap", "eth0"]
+# CMD ["nc","-l","8080"]

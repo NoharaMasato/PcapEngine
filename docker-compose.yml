@@ -6,6 +6,8 @@ services:
     build:
       context: ./
       dockerfile: ./docker/Dockerfile
+    depends_on:
+      - "redis"
     environment:
       - REDIS_HOST=redis:6379
     networks:
@@ -48,6 +50,8 @@ services:
     privileged: true
     cap_drop:
       - NET_ADMIN
+    depends_on:
+      - "packet-dst"
     build:
       context: ./
       dockerfile: ./docker/src-Dockerfile

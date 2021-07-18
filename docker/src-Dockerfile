@@ -2,10 +2,10 @@ FROM ubuntu:latest
 
 WORKDIR /
 RUN apt-get update -y && apt-get install -y netcat iproute2 iputils-ping tcpdump
-COPY docker/src-start.sh .
+COPY docker/start_script/src-start.sh .
 
 # コンテナを立ち上げるときにdefault gatewayを設定する必要がある。
 # docker-composeではdefault gatewayをコンテナをipアドレスに設定できない(https://forums.docker.com/t/setting-default-gateway-to-a-container/17420/2)
-また、RUNによってコマンドを打つことも権限的にできない
+# また、RUNによってコマンドを打つことも権限的にできない
 CMD ["bash", "src-start.sh"]
 

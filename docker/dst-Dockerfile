@@ -2,7 +2,7 @@ FROM ubuntu:latest
 
 WORKDIR /
 RUN apt-get update -y && apt-get install -y netcat iproute2 iputils-ping tcpdump
-COPY docker/dst-start.sh .
+COPY docker/start_script/dst-start.sh .
 
 CMD ["bash", "dst-start.sh"]
 

@@ -16,7 +16,7 @@ const int ETHERNET_HEADER_SIZE = 10, IP_HEADER_SIZE = 20, UDP_HEADER_SIZE = 8;
 
 struct five_tuple {
   in_addr src_ip, dst_ip;
-  u_char ip_version;
+  unsigned int ip_version;
   unsigned short src_port, dst_port;
   bool operator==(const five_tuple &other) const;
   std::string to_string();
@@ -47,7 +47,7 @@ class Packet {
   struct ether_addr *src_ether_addr(), *dst_ether_addr();
 
   // ip layer
-  u_char ip_version();
+  unsigned int ip_version();
   in_addr src_ip_addr(), dst_ip_addr();
 
   // transport layer

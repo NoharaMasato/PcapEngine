@@ -44,7 +44,7 @@ struct ether_addr *Packet::dst_ether_addr() {
 in_addr Packet::src_ip_addr() { return ip_header->ip_src; }
 in_addr Packet::dst_ip_addr() { return ip_header->ip_dst; }
 
-u_char Packet::ip_version() { return ip_header->ip_v; }
+unsigned int Packet::ip_version() { return ip_header->ip_v; }
 
 unsigned short Packet::src_port() {
   if (ip_header->ip_p == IPPROTO_TCP)

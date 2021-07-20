@@ -2,7 +2,8 @@
 
 eth_device::eth_device(std::string name) {
   device_name = name;
-  if (name.substr(0, 3) == "eth" || name.substr(0, 3) == "enp") {
+  if (device_name.find("eth") != std::string::npos ||
+    device_name.find("enp") != std::string::npos) {
     device_type = ETHERNET;
   } else if (name.substr(0, 2) == "lo") {
     device_type = LOOPBACK;

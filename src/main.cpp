@@ -11,10 +11,12 @@
 #include "packet.hpp"
 #include "redis.hpp"
 #include "tcp_stream.hpp"
+#include "check.hpp"
 
 eth_device *DEVICE;
 std::unordered_map<five_tuple, tcp_stream> tcp_streams;  // hash table
 long long int total_packet_size(0);
+
 
 void my_callback(u_char *useless __attribute__((unused)),
                  const struct pcap_pkthdr *pkthdr, const u_char *packet) {
@@ -24,12 +26,12 @@ void my_callback(u_char *useless __attribute__((unused)),
 
   if ((packet[ip_header_start] >> 4) == 4) {
     Packet pkt(packet, pkthdr->len, ip_header_start);
-    pkt.print_meta_data();
+    // pkt.print_meta_data();
 
+  check_packet(&pkt);
 #ifdef REDIS
-    insert_string(
-        pkt.to_five_tuple().to_string(),
-        std::string(reinterpret_cast<const char *>(pkt.l7_content())));
+    insert_string(DEVICE->get_device_name(),
+        pkt.to_five_tuple().to_string());
 #endif
 
     tcp_streams[pkt.to_five_tuple()].add_packet_to_stream(&pkt);
@@ -86,7 +88,6 @@ int main(int argc, char *argv[]) {
   std::chrono::system_clock::time_point start, end;
   start = std::chrono::system_clock::now();
 
-  redis_init();
   pcap_loop(pcap_handle, PACKET_CNT, my_callback, NULL);
 
   //ここまでに受け取ったパケットの統計情報をstatに入れる

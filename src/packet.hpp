@@ -39,6 +39,8 @@ class Packet {
   struct tcphdr *tcp_header;
   struct udphdr *udp_header;
 
+  int tag;
+
  public:
   // constractor
   Packet(const u_char *packet, int len, int ip_hdr_start);
@@ -58,6 +60,11 @@ class Packet {
 
   // return five tuple
   five_tuple to_five_tuple();
+
+  // options in tcp header
+  const int Packet::get_tag();
+
+  bool attach_tag(std::string tag);
 
   // print packet
   void print_meta_data();

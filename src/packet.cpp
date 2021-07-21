@@ -32,6 +32,14 @@ Packet::Packet(const u_char *packet, int len, int ip_hdr_start) {
     udp_header = (struct udphdr *)(packet + tcp_header_start);
     payload = (const u_char *)((unsigned char *)udp_header + UDP_HEADER_SIZE);
   }
+
+  // parse tag
+  // tcp header全体のバイト数: tcp_header->doff * 4 -- (1)
+  // tcp headerのoptions以外の部分のバイト数: 20 -- (2)
+  // optionsの長さ: (1) - (2)
+  if (ip_header->ip_p == IPPROTO_TCP) { // 今はoptionsの部分の長さを返しているだけ
+    tag = tcp_header->doff * 4 - 20;
+  }
 }
 
 struct ether_addr *Packet::src_ether_addr() {
@@ -65,6 +73,12 @@ unsigned short Packet::dst_port() {
 }
 
 const u_char *Packet::l7_content() { return payload; }
+
+const int Packet::get_tag() { return tag; }
+
+bool attach_tag(std::string tag) {
+  // tagをつける（今のままでは、libpcapを使っているのでできない)
+}
 
 five_tuple Packet::to_five_tuple() {
   return five_tuple{src_ip_addr(), dst_ip_addr(), ip_version(), src_port(),

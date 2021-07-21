@@ -6,7 +6,7 @@
 #define MESURE_TIME
 
 // redis
-// #define REDIS
+#define REDIS
 // #define PRINT_STREAM
 
 // 処理するパケットの個数(0は無限に処理する)
